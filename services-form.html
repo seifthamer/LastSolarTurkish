@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Istanbul Solar</title>
+    <link rel="icon" href="assets/img/logomenu.svg" />
+    <!-- CSS only -->
+    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+    <!-- fancybox -->
+    <link rel="stylesheet" href="assets/css/jquery.fancybox.min.css">
+    <link rel="stylesheet" href="assets/css/slick.css">
+    <link rel="stylesheet" href="assets/css/slick-theme.css">
+    <link rel="stylesheet" href="assets/css/swiper.css">
+    <link rel="stylesheet" href="assets/css/fontawesome.min.css">
+    <link rel="stylesheet" href="assets/font/flaticon_mycollection.css">
+    <!-- style -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- responsive -->
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <script src="assets/js/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/preloader.js"></script>
+    <script src="./assets/config.js"></script>
+</head>
+<body>
+    <div class="preloader">
+        <div id="loader"></div>
+    </div>
+
+    <header>
+        <!-- Add your existing header content here -->
+    </header>
+
+    <section style="background-image: url(/api/placeholder/1920/679);" class="bannr">
+        <div class="container">
+            <div class="bannr-text">
+                <h2>Create Service</h2>
+                <p>Add a new service to showcase your offerings</p>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="services.html">Our Services</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Create Service</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <section class="gap our-services">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="service">
+                        <h2>Create a New Service</h2>
+                        <form id="serviceForm">
+                            <div class="mb-3">
+                              <label for="title" class="form-label">Service Title</label>
+                              <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                              <label for="icon" class="form-label">Service Icon</label>
+                              <input type="text" class="form-control" id="icon" name="icon" placeholder="e.g., fa-solid fa-cog" required>
+                              <small class="form-text text-muted">Enter a Font Awesome icon class (e.g., fa-solid fa-cog)</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                              <label for="description" class="form-label">Service Description</label>
+                              <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn">Add Service</button>
+                          </form>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="sidebar">
+                        <h3>Recent Services</h3>
+                        <ul class="recent-services" id="recentServices">
+                            <!-- Recent services will be dynamically inserted here -->
+                        </ul>
+                    </div>
+                    <!-- Add more sidebar content as needed -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer style="background-image: url(assets/img/footer-line.png);">
+        <!-- Add your existing footer content here -->
+    </footer>
+
+    <script>
+        // Handling form submission using fetch API
+        document.getElementById('serviceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const serviceData = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch(`${baseUrl}/api/services`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token') // Authorization for protected routes
+                    },
+                    body: JSON.stringify(serviceData)
+                });
+
+                if (response.ok) {
+                    alert('Service created successfully!');
+                    window.location.href = '/services.html';
+                } else {
+                    throw new Error('Error creating service');
+                }
+            } catch (error) {
+                console.error('Error creating service:', error);
+                alert('Error creating service. Please try again.');
+            }
+        });
+
+        // Fetch and display recent services
+        async function fetchRecentServices() {
+            try {
+                const response = await fetch(`${baseUrl}/api/services`);
+                const recentServices = await response.json();
+                const recentServicesHtml = recentServices.slice(0, 3).map(service => `
+                    <li>
+                        <div class="icon">
+                            <i class="${service.icon}"></i>
+                        </div>
+                        <div>
+                            <a href="service-details.html?id=${service._id}">${service.title}</a>
+                            <p>${service.description.substring(0, 50)}...</p>
+                        </div>
+                    </li>
+                `).join('');
+                document.getElementById('recentServices').innerHTML = recentServicesHtml;
+            } catch (error) {
+                console.error('Error fetching recent services:', error);
+            }
+        }
+
+        fetchRecentServices();
+    </script>
+
+    <!-- Bootstrap Js -->
+    <script src="assets/js/bootstrap.min.js"></script>
+    <!-- fancybox -->
+    <script src="assets/js/jquery.fancybox.min.js"></script>
+    <script src="assets/js/slick.min.js"></script>
+    <script src="assets/js/swiper.js"></script>
+    <script src="assets/js/custom.js"></script>
+</body>
+</html>
